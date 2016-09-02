@@ -14,8 +14,12 @@ defmodule NucleotideCount do
   """
   @spec count([char], char) :: non_neg_integer
   def count(strand, nucleotide) do
-    unless(Enum.member?(@nucleotides, nucleotide), do: raise(ArgumentError, message: "invalid nucleotide"))
-    unless(Enum.all?(strand, &(Enum.member?(@nucleotides, &1))), do: raise(ArgumentError, message: "invalid strand"))
+    unless nucleotide in @nucleotides,
+      do: raise(ArgumentError, message: "invalid nucleotide")
+
+    unless Enum.all?(strand, &(&1 in @nucleotides)),
+      do: raise(ArgumentError, message: "invalid strand")
+
     Enum.count(strand, &(&1 == nucleotide))
   end
 
@@ -30,6 +34,7 @@ defmodule NucleotideCount do
   """
   @spec histogram([char]) :: map
   def histogram(strand) do
-
+    summary = %{?A => 0, ?T => 0, ?C => 0, ?G => 0}
+    Map.new(Enum.map(summary, fn({k, v}) -> {k, count(strand,  k)} end))
   end
 end
